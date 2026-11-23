@@ -17,7 +17,9 @@ htmlcov/
 
 # Secrets and runtime state
 credentials.json
+config.json
 state/
+data/
 *.state.json
 *.leases
 *.pid

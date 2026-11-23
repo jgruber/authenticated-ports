@@ -1,0 +1,47 @@
+# docker-compose up -d
+#
+# This compose file assumes you will terminate TLS at a reverse proxy
+# (nginx, Caddy, Traefik, etc.) in front of this service. The app
+# therefore listens on plain HTTP and trusts the proxy's
+# X-Forwarded-* headers via AP_BEHIND_PROXY=1.
+#
+# To serve HTTPS directly instead, uncomment AP_TLS_CERT / AP_TLS_KEY
+# below and drop the cert/key into ./data/certs/, and unset
+# AP_BEHIND_PROXY.
+#
+# IMPORTANT: this service uses `network_mode: host`.
+#
+# UPnP IGD discovery relies on SSDP, a multicast protocol on
+# 239.255.255.250:1900. Docker's default `bridge` network does NOT
+# forward multicast to the host LAN, so a bridge-networked container
+# would never discover the gateway. `host` networking gives the
+# container direct access to the LAN interface (and the gateway's
+# SSDP responses).
+#
+# Consequence of host networking: the `ports:` block is ignored. The
+# app listens on whatever AP_LISTEN_PORT is set to, bound on every
+# host interface. If that's not what you want, pin AP_LISTEN_HOST to
+# the LAN interface's address (e.g. "192.168.0.65") or to "127.0.0.1"
+# when the reverse proxy lives on the same host.
+
+services:
+  authenticated-ports:
+    build: .
+    image: authenticated-ports:local
+    container_name: authenticated-ports
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      AP_LISTEN_HOST: "0.0.0.0"
+      AP_LISTEN_PORT: "8080"
+      AP_CREDENTIALS: "/data/credentials.json"
+      AP_MAPPINGS: "/data/mappings.json"
+      AP_CONFIG: "/data/config.json"
+      AP_BEHIND_PROXY: "1"
+      # AP_TLS_CERT: "/data/certs/server.crt"
+      # AP_TLS_KEY:  "/data/certs/server.key"
+      AP_LOG_LEVEL: "INFO"
+    volumes:
+      - ./data:/data
+    # If you want to use the OS `upnpc` CLI fallback instead of the
+    # Python library, pass: command: ["serve","--backend-prefer","cli"]
