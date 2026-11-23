@@ -1,0 +1,12 @@
+# Phase 1 (probe + backend)
+miniupnpc>=2.2.6 ; platform_system != "Windows"
+
+# Phase 2 (web app) — pulled in once Phase 2 lands
+Flask>=3.0
+Flask-WTF>=1.2
+Flask-Limiter>=3.5
+argon2-cffi>=23.1
+PyYAML>=6.0
+
+# Dev / test
+pytest>=8.0

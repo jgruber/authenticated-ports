@@ -1,0 +1,34 @@
+{
+  "mappings": [
+    {
+      "id": "home-rdp",
+      "name": "Home desktop RDP",
+      "protocol": "tcp",
+      "external_port": 53389,
+      "internal_host": "192.168.1.50",
+      "internal_port": 3389,
+      "lease_seconds": 3600,
+      "description": "RDP to home desktop"
+    },
+    {
+      "id": "lab-ssh",
+      "name": "Lab SSH",
+      "protocol": "tcp",
+      "external_port": 52222,
+      "internal_host": "192.168.1.60",
+      "internal_port": 22,
+      "lease_seconds": 1800,
+      "description": "SSH to lab box"
+    },
+    {
+      "id": "game-udp",
+      "name": "Example UDP service",
+      "protocol": "udp",
+      "external_port": 55555,
+      "internal_host": "192.168.1.70",
+      "internal_port": 27015,
+      "lease_seconds": 7200,
+      "description": "Example UDP game service"
+    }
+  ]
+}
