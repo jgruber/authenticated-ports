@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · authenticated-ports{% endblock %}
+{% block content %}
+<header class="flex items-center justify-between mb-5">
+  <div>
+    <h1 class="text-xl font-semibold">Port forwards</h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400">
+      Signed in as <span class="font-mono">{{ user }}</span>
+      <span class="text-slate-400">· idle timeout {{ (idle_timeout // 60) }} min</span>
+    </p>
+  </div>
+  <form method="post" action="{{ url_for('logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit"
+            class="rounded-md border border-slate-300 dark:border-slate-600
+                   bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700
+                   px-3 py-2 text-sm font-medium transition">
+      Log out
+    </button>
+  </form>
+</header>
+
+<section class="rounded-xl bg-white dark:bg-slate-800 shadow p-4 sm:p-5 mb-5">
+  <div class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+    Gateway external IP
+  </div>
+  <div class="font-mono text-lg mt-1 break-all">{{ external_ip }}</div>
+</section>
+
+<ul class="space-y-3">
+  {% for row in rows %}
+    {% set m = row.mapping %}
+    <li class="rounded-xl bg-white dark:bg-slate-800 shadow p-4 sm:p-5">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h2 class="font-medium">{{ m.name }}</h2>
+            <span class="rounded-full px-2 py-0.5 text-xs font-mono
+                         bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
+              {{ m.protocol | upper }}/{{ m.external_port }}
+            </span>
+            {% if row.active %}
+              <span class="rounded-full px-2 py-0.5 text-xs
+                           bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+                active
+              </span>
+            {% elif row.owned_by_other %}
+              <span class="rounded-full px-2 py-0.5 text-xs
+                           bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200">
+                open by another session
+              </span>
+            {% endif %}
+          </div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono break-all">
+            → {{ m.internal_host }}:{{ m.internal_port }}
+            · lease {{ m.lease_seconds }}s
+          </div>
+          {% if m.description %}
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              {{ m.description }}
+            </div>
+          {% endif %}
+          {% if row.active and row.connect_string %}
+            <div class="mt-2 rounded-md border border-dashed border-emerald-300 dark:border-emerald-700
+                        bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 font-mono text-sm break-all">
+              {{ row.connect_string }}
+            </div>
+          {% endif %}
+        </div>
+
+        <form method="post"
+              action="{{ url_for('deactivate' if row.active else 'activate', mapping_id=m.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button type="submit"
+                  {% if row.owned_by_other and not row.active %}disabled{% endif %}
+                  class="toggle-btn rounded-md px-3 py-2 text-sm font-medium transition
+                         {% if row.active %}
+                           bg-rose-600 hover:bg-rose-700 text-white
+                         {% else %}
+                           bg-sky-600 hover:bg-sky-700 text-white
+                         {% endif %}">
+            {{ 'Close' if row.active else 'Open' }}
+          </button>
+        </form>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
+{% if rows | length == 0 %}
+  <div class="rounded-xl bg-white dark:bg-slate-800 shadow p-5 text-sm text-slate-500">
+    No mappings configured. Add entries to mappings.json and restart.
+  </div>
+{% endif %}
+{% endblock %}

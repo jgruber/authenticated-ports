@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" class="h-full bg-slate-50 dark:bg-slate-900">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}authenticated-ports{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: { extend: {
+        fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','Monaco','Consolas','monospace'] }
+      } }
+    }
+  </script>
+  <style>
+    html, body { -webkit-tap-highlight-color: transparent; }
+    .toggle-btn:disabled { opacity: .5; cursor: not-allowed; }
+  </style>
+</head>
+<body class="min-h-full antialiased text-slate-800 dark:text-slate-100">
+  <main class="mx-auto max-w-2xl px-4 sm:px-6 py-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="space-y-2 mb-4" role="status" aria-live="polite">
+          {% for category, msg in messages %}
+            <div class="rounded-md px-3 py-2 text-sm
+                 {% if category == 'error' %}bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-100
+                 {% else %}bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-100{% endif %}">
+              {{ msg }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+    <footer class="mt-8 text-center text-xs text-slate-400">
+      authenticated-ports
+    </footer>
+  </main>
+</body>
+</html>

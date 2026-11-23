@@ -1,0 +1,15 @@
+{
+  "listen_host": "0.0.0.0",
+  "listen_port": 8443,
+  "tls_cert": "/data/certs/server.crt",
+  "tls_key": "/data/certs/server.key",
+  "idle_timeout_seconds": 1800,
+  "lockout_threshold": 5,
+  "lockout_window_seconds": 900,
+  "credentials_path": "/data/credentials.json",
+  "mappings_path": "/data/mappings.json",
+  "state_path": "/data/state/active_mappings.json",
+  "audit_log_path": "/data/state/audit.log",
+  "description_prefix": "authenticated-ports",
+  "behind_proxy": false
+}
